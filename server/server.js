@@ -1,21 +1,36 @@
-var http = require('http');
+const express = require("express");
+const connectDB = require("./db");
+const cookieParser = require("cookie-parser");
+const bodyParser = require('body-parser');
+const app = express();
+const cors = require('cors');
+const { adminAuth, userAuth } = require("./middleware/auth.js");
+const router = express.Router();
 
+app.use(bodyParser.urlencoded({ extended:  true }));
+app.use(bodyParser.json());
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
+app.use("/api/auth", require("./Auth/route"));
+app.use('/api', router);
 
-var hostname  = '127.0.0.1';
+app.get("/admin", adminAuth, (req, res) => res.send("Admin Route"));
+app.get("/basic", userAuth, (req, res) => res.send("User Route"));
+app.get("/logout", (req, res) => {
+  res.cookie("jwt", "", { maxAge: "1" })
+  res.redirect("/")
+})
 
-var port      = 3000;
+const PORT = 5000;
 
+connectDB();
 
-var app = http.createServer(function(req, res) {
-
-            res.setHeader('Content-Type', 'application/json');
-            res.end(
-              JSON.stringify({
-                firstName: "John",
-                lastName: "Doe"
-              })
-            );
-          });
-
-
-app.listen(port, hostname);
+const server = app.listen(PORT, () =>
+  console.log(`Server Connected to port ${PORT}`)
+)
+// Handling Error
+process.on("unhandledRejection", err => {
+  console.log(`An error occurred: ${err.message}`)
+  server.close(() => process.exit(1))
+})

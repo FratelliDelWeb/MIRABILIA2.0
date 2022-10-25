@@ -1,8 +1,10 @@
-const  config = {
-  user: 'DB_61033_dbmira_user',
-  password: 'gezo7810',
-  server: 's26.winhost.com', 
-  database: 'DB_61033_dbmira',
+const Mongoose = require("mongoose")
+const mongoDB = `mongodb+srv://MirabilliaSimple:Satanassi112@cluster0.ipgzzlv.mongodb.net/MirabilliaDB`
+const connectDB = async () => {
+  await Mongoose.connect(mongoDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  console.log("MongoDB Connected")
 }
-
-module.exports = config;
+module.exports = connectDB
